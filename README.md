@@ -4,11 +4,11 @@
 
 - Create Swarm Cluster of 3 nodes on digitalocean
 - Run Consul Cluster on Swarm
-- Make 2/3 nodes data nodes (using labels)
+- Make 2 of 3 nodes the data nodes (label data=true)
 - Attach volumes (block storage) to data nodes
 - Install and setup portworx cluster for data nodes; Use consul KV store
 - Create volume and run app services (api app & database)
-- Test MySQL state toggling the data nodes on swarm cluster
+- Test MySQL state by toggling the data nodes on swarm cluster
 
 *Tested on docker version Docker version 17.12.0-ce, build c97c6d6*
 
@@ -54,7 +54,8 @@ Test Consul CLI - https://github.com/devteds/swarm-consul/blob/master/README.md#
 
 ## Cloud (Digital Ocean)
 
-- Add volumes of 5G to the nodes that are labelled `data`
+- Add volumes of 5G to the data nodes (node-2 & node-3)
+  - Login to DO > Droplets > node-2|node-3 > Volumes > Add Volume > 5GB > Create Volume
 - Test new volume mount on the nodes using `lsblk`
 - New volumes should appear as /dev/sda (or `sda` with type as disk) in the output of `lsblk`
 
@@ -95,15 +96,15 @@ docker-machine ssh node-3 /opt/pwx/bin/pxctl status
 
 Output should start with `Status: PX is operational` and the details of the block device.
 
-Also verify consule key/value,
+Also verify consul key/value,
 
 ```
 open "http://$(docker-machine ip node-1):8500/ui/#/dc1/kv/"
 ```
 
-## Application
+## Application Stack
 
-Check the `db` service in `app.yml` to learn how the portworx volume is created and used.
+API service and a datbase service that use portworx volume. Check the `db` service in `app.yml` to learn how the portworx volume is created and used.
 
 ```
 eval $(docker-machine env node-1)
