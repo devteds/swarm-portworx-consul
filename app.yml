@@ -1,0 +1,50 @@
+version: '3.2'
+
+services:
+
+  api:
+    image: devteds/rails-sample-app
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    ports:
+      - 3000:3000
+    environment:
+      DB_USER: root
+      DB_NAME: noteapp
+      DB_PASSWORD: password
+      DB_HOST: db
+      RAILS_ENV: production
+      RAILS_LOG_TO_STDOUT: 1
+      RAILS_SERVE_STATIC_FILES: 1
+      SECRET_KEY_BASE: 5156ca5a10c6842c4359d9a78ba14a4ba91cee9394d2e87bb783a0f770469d6afd725d40346d328b705cb2b74ef7de2005701c3449a1dbd1d1bc163ce3b67ec1
+
+  db:
+    image: mysql:5.7
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.data == true
+    volumes:
+      - mydb:/var/lib/mysql:rw
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: noteapp
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: password
+
+volumes:
+  mydb:
+    driver: pxd
+    driver_opts:
+      size: 3
+
+# created in ./swarm.sh
+networks:
+  default:
+    external:
+      name: core-infra
