@@ -16,12 +16,15 @@
 
 Create swarm cluster of those 3 nodes on digitalocean. Optionally, edit `swarm.sh` to change DigitalOcean droplet configs.
 
+- node-1 manager
+- node-2 worker, labelled (data=true)
+- node-3 worker, labelled (data=true)
+
 ```
 export DO_TOKEN=<DigitalOcean API Access Token>
 ./swarm.sh
 ```
 
-**Volumes:** Create and attach volumes on digital ocean
 
 ## Consul Cluster
 
@@ -111,7 +114,7 @@ eval $(docker-machine env node-1)
 docker stack deploy -c app.yml app
 ```
 
-Verify the stack & containers. Current State should be "Running x ....s"
+Verify the stack & containers. Current State should be "Running x ....s ago"
 
 ```
 docker stack ps -f "desired-state=running" app
@@ -150,14 +153,17 @@ Webpage should list all the notes records and you should be able view or edit.
 Let the node that run mysql container (or db service container), leave swarm cluster
 
 ```
+# Switch to swarm manager, if not already on.
+eval $(docker-machine env node-1)
 docker stack ps -f "desired-state=running" app
 
 # Let's make the db node leave swarm
 node=$(docker stack ps -f "desired-state=running" app | grep app_db | awk '{print $4}' | head -1)
-./swarm_leave. $node
+echo $node
+./swarm_leave.sh $node
 
 # Check swarm nodes & status
-docker-machine ssh node-1 docker node ls
+docker node ls
 
 # Give it a couple of seconds and see the sttus.
 docker stack ps -f "desired-state=running" app
@@ -165,7 +171,7 @@ docker stack ps -f "desired-state=running" app
 
 Keep checking the stack status. 
 
-The app_db service container will have a brief outage and start up on the other data node. That will initially be in "Preparing .." and the application should work when the Current State of that new container changes to "Running x ....s"
+The app_db service container will have a brief outage and start up on the other data node. That will initially be in "Preparing .." and the application should work when the Current State of that new container changes to "Running x ....s ago"
 
 ```
 docker stack ps -f "desired-state=running" app
@@ -181,14 +187,15 @@ docker stack ps -f "desired-state=running" app
 ./swarm_join.sh $node
 
 # Check swarm nodes & status
-docker-machine ssh node-1 docker node ls
+docker node ls
 
 # Let's make the current active db node leave swarm
 node=$(docker stack ps -f "desired-state=running" app | grep app_db | awk '{print $4}' | head -1)
-./swarm_leave. $node
+echo $node
+./swarm_leave.sh $node
 
 # Check swarm nodes & status
-docker-machine ssh node-1 docker node ls
+docker node ls
 
 # Give it a couple of seconds and see the sttus.
 docker stack ps -f "desired-state=running" app

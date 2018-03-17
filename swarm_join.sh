@@ -2,8 +2,6 @@
 
 source "$(dirname $0)/common.sh"
 
-run_or_exit "testing" "ls -ltr"
-
 node=$1
 
 manager_ip=$(docker-machine ssh node-1 ifconfig eth1 | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1)

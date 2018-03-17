@@ -9,8 +9,8 @@ done
 
 sleep 2
 
-PX_DOCKER_IMAGE="portworx/px-enterprise:1.3.0"
-# PX_DOCKER_IMAGE="portworx/px-dev:1.3.0"
+# PX_DOCKER_IMAGE="portworx/px-enterprise:1.3.0"
+PX_DOCKER_IMAGE="portworx/px-dev:1.3.0"
 
 # Install Portworx runC on node 2 & 3
 for i in 2 3; do 
